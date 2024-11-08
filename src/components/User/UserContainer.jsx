@@ -13,23 +13,29 @@ const UserContainer = () => {
     useEffect(() => {
         if (!token) {
             navigate('/inicio-sesion');
-            return;
+            return
         }
 
         const getDataUsers = async () => {
             try {
+                if (!token) {
+                    console.error("Token no encontrado o inválido");
+                    return;
+                }
+        
                 const response = await fetch("http://localhost:5000/users", {
                     method: "GET",
                     headers: {
-                        "Authorization": `Bearer ${token}`
+                        "Authorization": `Bearer ${token}`,
+                        "Content-Type": "application/json" // Añadir encabezado
                     }
                 });
-
+        
                 if (!response.ok) {
-                    console.log("Error en la consulta");
+                    console.error("Error en la consulta:", response.status, response.statusText);
                     return;
                 }
-
+        
                 const data = await response.json();
                 setData(data);
             } catch (error) {
@@ -38,6 +44,7 @@ const UserContainer = () => {
                 setLoadingData(false);
             }
         };
+        
 
         getDataUsers();
     }, [token, navigate]); // Dependencia en `token` y `navigate` para ejecutar solo cuando cambie el token

@@ -24,10 +24,10 @@ const LoginUser = () => {
             }
 
             const data = await response.json();  
-            console.log('Token recibido:', data.token);
+            console.log('Token recibido:', data.access_token);
 
             // Almacenar el token en localStorage
-            localStorage.setItem('token', data.token);
+            localStorage.setItem('token', data.access_token);
         } catch (error) {
             console.error('Hubo un error en el login:', error);  
         }
