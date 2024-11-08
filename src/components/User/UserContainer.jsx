@@ -1,55 +1,46 @@
-import { useState, useEffect } from "react";
-import UsersView from "./UserView";
-import { useNavigate } from 'react-router-dom';
+import { useState, useEffect, Fragment } from 'react'
 
-const UserContainer = () => {
-    const [data, setData] = useState([]);
-    const [loadingData, setLoadingData] = useState(true);
-    const navigate = useNavigate();
+import UsersView from './UserView';
 
-    // Verificar si el token existe antes de usarlo
-    const token = localStorage.getItem('token');
-    console.log('Token', token);
-    useEffect(() => {
-        if (!token) {
-            navigate('/inicio-sesion');
-            return
-        }
+const UsersContainer = () => {
+    const [dataUsers, setDataUsers] = useState([]),
+        [loadingUsers, setLoadingUsers] = useState(true);
 
-        const getDataUsers = async () => {
-            try {
-                if (!token) {
-                    console.error("Token no encontrado o inválido");
-                    return;
-                }
-        
-                const response = await fetch("http://localhost:5000/users", {
-                    method: "GET",
+    const token = JSON.parse(localStorage.getItem('token'))
+
+    const getDataUsers = async () => {
+        try {
+            const response = await fetch("http://127.0.0.1:5000/users",
+                {
                     headers: {
-                        "Authorization": `Bearer ${token}`,
-                        "Content-Type": "application/json" // Añadir encabezado
+                        "Authorization": `Bearer ${token}`
                     }
-                });
-        
-                if (!response.ok) {
-                    console.error("Error en la consulta:", response.status, response.statusText);
-                    return;
                 }
-        
-                const data = await response.json();
-                setData(data);
-            } catch (error) {
-                console.log("Error en la API", error);
-            } finally {
-                setLoadingData(false);
+            )
+            console.log("response", response)
+            if (!response.ok) {
+                console.log("Hubo un error en la peticion")
             }
-        };
-        
 
-        getDataUsers();
-    }, [token, navigate]); // Dependencia en `token` y `navigate` para ejecutar solo cuando cambie el token
+            const results = await response.json()
+            setDataUsers(results)
+        } catch (error) {
+            console.log("Hubo un error en la api ", error)
+        } finally {
+            setLoadingUsers(false)
+        }
+    }
 
-    return <UsersView loadingData={loadingData} data={data} />;
-};
+    console.log("dataUsers", dataUsers)
 
-export default UserContainer;
+    useEffect(() => {
+        getDataUsers()
+    }, [])
+
+    return (
+        <UsersView loadingUsers={loadingUsers} dataUsers={dataUsers} />
+    )
+
+}
+
+export default UsersContainer

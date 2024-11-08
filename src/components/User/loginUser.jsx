@@ -1,56 +1,44 @@
-import { Formik } from "formik";
-import * as Yup from 'yup';
+import { Formik } from "formik"
+import * as Yup from 'yup'
 
 const LoginUser = () => {
 
     const onLoginUser = async (values) => {
-        try {
-            const response = await fetch('http://localhost:5000/login', {
-                method: 'POST',
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({
-                    username: values.username,
-                    password: values.password
-                })
-            });
 
-            if (!response.ok) {
-                console.log('Error en la solicitud', response.status);  
-                const errorData = await response.json();  
-                console.log('Error de login:', errorData.msg);
-                return;
+        const bodyUserLogin = btoa(`${values.username}:${values.password}`)
+
+        const response = await fetch('http://127.0.0.1:5000/login', {
+            method: 'POST',
+            headers: {
+                'Authorization': `Basic ${bodyUserLogin}`
             }
+        })
 
-            const data = await response.json();  
-            console.log('Token recibido:', data.access_token);
-
-            // Almacenar el token en localStorage
-            localStorage.setItem('token', data.access_token);
-        } catch (error) {
-            console.error('Hubo un error en el login:', error);  
+        if (!response.ok) {
+            console.log("Hubo un error en la llamada a la api")
         }
-    };
+
+        const data = await response.json()
+
+        localStorage.setItem('token', JSON.stringify(data.Token))
+
+        console.log(data.Token)
+
+    }
 
     const ValidationSchema = Yup.object().shape({
-        password: Yup.string()
-            .required('Este es un campo requerido.')
-            .min(4, 'Mínimo 4 caracteres.'),
         username: Yup.string()
-            .min(4, 'Mínimo 4 caracteres.')
-            .max(25, 'Máximo 25 caracteres.')
-            .required('Este es un campo requerido.')
-    });
+            .required('Este campo es requerido')
+            .max(50, 'El username no debe ser mayor a 50 caracteres'),
+        password: Yup.string()
+            .required('Este campo es requerido')
+            .max(50, 'La contraseña no debe ser mayor a 50 caracteres')
+    })
 
     return (
         <Formik
-            initialValues={{ username: '', password: '' }}
+            initialValues={{ password: '', username: '' }}
             validationSchema={ValidationSchema}
-            onSubmit={(values, { setSubmitting }) => {
-                onLoginUser(values);
-                setSubmitting(false); // Esto asegura que el formulario no quede en estado de "enviando"
-            }}
         >
             {({
                 values,
@@ -58,10 +46,11 @@ const LoginUser = () => {
                 touched,
                 handleChange,
                 handleBlur,
-                isValid,
-                handleSubmit,
+                isSubmitting,
+                isValid
+                /* and other goodies */
             }) => (
-                <form onSubmit={handleSubmit}>
+                <form>
                     <input
                         type="text"
                         name="username"
@@ -69,8 +58,7 @@ const LoginUser = () => {
                         onBlur={handleBlur}
                         value={values.username}
                     />
-                    {errors.username && touched.username && <div>{errors.username}</div>}
-                    
+                    {errors.username && touched.username && errors.username}
                     <input
                         type="password"
                         name="password"
@@ -78,18 +66,14 @@ const LoginUser = () => {
                         onBlur={handleBlur}
                         value={values.password}
                     />
-                    {errors.password && touched.password && <div>{errors.password}</div>}
-                    
-                    <button 
-                        type="submit"
-                        disabled={!isValid}
-                    >
-                        Iniciar sesión
+                    {errors.password && touched.password && errors.password}
+                    <button onClick={() => onLoginUser(values)} type="button" disabled={values.password === '' || values.username === '' || !isValid}>
+                        Iniciar Sesión
                     </button>
                 </form>
             )}
         </Formik>
-    );
-};
+    )
 
-export default LoginUser;
+}
+export default LoginUser
