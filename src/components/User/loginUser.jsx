@@ -18,7 +18,7 @@ const LoginUser = () => {
             console.log("Hubo un error en la llamada a la api")
         }
 
-        const data = await response.json()
+        const data = await response.json()  
 
         localStorage.setItem('token', JSON.stringify(data.Token))
 
@@ -30,9 +30,10 @@ const LoginUser = () => {
         username: Yup.string()
             .required('Este campo es requerido')
             .max(50, 'El username no debe ser mayor a 50 caracteres'),
-        password: Yup.string()
+        password: Yup.string()  
             .required('Este campo es requerido')
             .max(50, 'La contraseña no debe ser mayor a 50 caracteres')
+            
     })
 
     return (

@@ -8,12 +8,12 @@ import { ToggleButton } from "primereact/togglebutton";
 import { Formik } from "formik";
 import * as Yup from "yup";
 
-const UsersView = ({ loadingUsers, dataUsers }) => {
-    const token = JSON.parse(localStorage.getItem("access_token"));
-
+const UsersView = ({ loadingUsers, dataUsers, fetchUsers }) => {
+    const token = JSON.parse(localStorage.getItem("token"));
     const [openDialogEditUser, setOpenDialogEditUser] = useState(false);
     const [editUser, setEditUser] = useState({});
 
+    // Función para mostrar el estado de is_admin como "Sí" o "No"
     const bodyIsAdmin = (rowData) => {
         return rowData.is_admin ? <span>Si</span> : <span>No</span>;
     };
@@ -44,6 +44,7 @@ const UsersView = ({ loadingUsers, dataUsers }) => {
             .max(50, "El nombre de usuario no debe ser mayor a 50 caracteres"),
     });
 
+    // Función para editar el usuario
     const onEditUser = async (values) => {
         if (!editUser.id) {
             console.error("User ID is undefined");
@@ -57,7 +58,7 @@ const UsersView = ({ loadingUsers, dataUsers }) => {
 
         try {
             const response = await fetch(
-                `http://127.0.0.1:5000/users/${editUser.id}`,
+                `http://localhost:5000/users/${editUser.id}`,
                 {
                     method: "PUT",
                     body: JSON.stringify(bodyEditUser),
@@ -71,8 +72,9 @@ const UsersView = ({ loadingUsers, dataUsers }) => {
             if (response.ok) {
                 console.log("User updated successfully");
                 setOpenDialogEditUser(false);
+                fetchUsers(); // Actualizar la lista después de la edición
             } else {
-                const errorData = await response.json(); // Obtener detalles del error
+                const errorData = await response.json(); 
                 console.error("Error updating user:", response.statusText, errorData);
             }
         } catch (error) {
@@ -80,12 +82,13 @@ const UsersView = ({ loadingUsers, dataUsers }) => {
         }
     };
 
+    // Función para eliminar el usuario
     const onDeleteUser = (userId) => {
         if (!userId) {
             console.error("User ID is undefined");
             return;
         }
-        fetch(`http://127.0.0.1:5000/users/${userId}`, {
+        fetch(`http://localhost:5000/users/${userId}`, {
             method: "DELETE",
             headers: {
                 Authorization: `Bearer ${token}`,
@@ -94,6 +97,7 @@ const UsersView = ({ loadingUsers, dataUsers }) => {
         .then((response) => {
             if (response.ok) {
                 console.log("User deleted successfully");
+                fetchUsers(); // Actualizar la lista después de la eliminación
             }
         })
         .catch((error) => console.error("Error deleting user:", error));
@@ -125,10 +129,11 @@ const UsersView = ({ loadingUsers, dataUsers }) => {
                 <Formik
                     initialValues={{
                         is_admin: editUser.is_admin || false,
-                        nombre_usuario: editUser.username || "", // Ajustado para mostrar el campo correcto
+                        nombre_usuario: editUser.username || "", 
                     }}
                     validationSchema={ValidationSchema}
                     enableReinitialize={true}
+                    onSubmit={(values) => onEditUser(values)}
                 >
                     {({
                         values,
@@ -136,6 +141,7 @@ const UsersView = ({ loadingUsers, dataUsers }) => {
                         touched,
                         handleChange,
                         handleBlur,
+                        setFieldValue,
                         isValid,
                     }) => (
                         <form style={{ display: "inline-grid" }}>
@@ -155,7 +161,7 @@ const UsersView = ({ loadingUsers, dataUsers }) => {
                             <ToggleButton
                                 name="is_admin"
                                 checked={values.is_admin}
-                                onChange={handleChange}
+                                onChange={(e) => setFieldValue("is_admin", e.value)}
                                 onLabel="Si"
                                 offLabel="No"
                             />
