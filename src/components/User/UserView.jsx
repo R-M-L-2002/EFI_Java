@@ -19,7 +19,6 @@ const UsersView = ({ loadingUsers, dataUsers }) => {
     };
 
     const bodyActions = (rowData) => {
-        console.log(rowData);
         return (
             <div>
                 <Button
@@ -33,16 +32,16 @@ const UsersView = ({ loadingUsers, dataUsers }) => {
                 <Button
                     icon="pi pi-trash"
                     label="Borrar"
-                    onClick={() => onDeletUser(rowData.id)}
+                    onClick={() => onDeleteUser(rowData.id)}
                 />
             </div>
         );
     };
 
     const ValidationSchema = Yup.object().shape({
-        username: Yup.string()
+        nombre_usuario: Yup.string()
             .required("Este campo es requerido")
-            .max(50, "El username no debe ser mayor a 50 caracteres"),
+            .max(50, "El nombre de usuario no debe ser mayor a 50 caracteres"),
     });
 
     const onEditUser = async (values) => {
@@ -52,7 +51,7 @@ const UsersView = ({ loadingUsers, dataUsers }) => {
         }
 
         const bodyEditUser = {
-            username: values.username,
+            nombre_usuario: values.nombre_usuario,
             is_admin: values.is_admin,
         };
 
@@ -73,14 +72,15 @@ const UsersView = ({ loadingUsers, dataUsers }) => {
                 console.log("User updated successfully");
                 setOpenDialogEditUser(false);
             } else {
-                console.error("Error updating user:", response.statusText);
+                const errorData = await response.json(); // Obtener detalles del error
+                console.error("Error updating user:", response.statusText, errorData);
             }
         } catch (error) {
             console.error("Error updating user:", error);
         }
     };
 
-    const onDeletUser = (userId) => {
+    const onDeleteUser = (userId) => {
         if (!userId) {
             console.error("User ID is undefined");
             return;
@@ -125,7 +125,7 @@ const UsersView = ({ loadingUsers, dataUsers }) => {
                 <Formik
                     initialValues={{
                         is_admin: editUser.is_admin || false,
-                        username: editUser.username || "",
+                        nombre_usuario: editUser.username || "", // Ajustado para mostrar el campo correcto
                     }}
                     validationSchema={ValidationSchema}
                     enableReinitialize={true}
@@ -142,13 +142,13 @@ const UsersView = ({ loadingUsers, dataUsers }) => {
                             <label>Nombre de usuario</label>
                             <input
                                 type="text"
-                                name="username"
+                                name="nombre_usuario"
                                 onChange={handleChange}
                                 onBlur={handleBlur}
-                                value={values.username}
+                                value={values.nombre_usuario}
                             />
-                            {errors.username && touched.username && (
-                                <div>{errors.username}</div>
+                            {errors.nombre_usuario && touched.nombre_usuario && (
+                                <div>{errors.nombre_usuario}</div>
                             )}
 
                             <label>¿Es administrador?</label>
@@ -162,7 +162,7 @@ const UsersView = ({ loadingUsers, dataUsers }) => {
                             <button
                                 type="button"
                                 onClick={() => onEditUser(values)}
-                                disabled={!values.username || !isValid}
+                                disabled={!values.nombre_usuario || !isValid}
                             >
                                 Modificar usuario
                             </button>
