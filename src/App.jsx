@@ -6,15 +6,16 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import UserContainer from './components/User/UserContainer';
 import { Menubar } from 'primereact/menubar';
 import LoginUser from './components/User/loginUser';
-
+import MarcaContainer from './components/marca/MarcaContainer';
+import CreateMarca from './components/marca/createMarca';
 
 function App() {
 
   const items = [
     { label: 'Usuario', icon: 'pi pi-spin pi-cog', url: '/usuarios' },
-    { label: 'Nuevo Usuario', icon: 'pi pi-users', url: '/nuevo-usuario' },
     { label: 'Home', icon: 'pi pi-home', url: '/' },
-    { label: 'inicio-sesion', icon: 'pi pi-home', url: '/inicio-sesion' }
+    { label: 'inicio-sesion', icon: 'pi pi-user', url: '/inicio-sesion' },
+    { label: 'marca', icon: 'pi pi-apple', url: '/marcas' }
   ]
 
   return (
@@ -25,6 +26,8 @@ function App() {
         <Route path='/usuarios' element={<UserContainer />} />
         <Route path='/nuevo-usuario' element={<CreateUser />} />
         <Route path='/inicio-sesion' element={<LoginUser />} />
+        <Route path='/marcas' element={<MarcaContainer />} />
+        <Route path='/nueva-marca' element={<CreateMarca/>} />
       </Routes>
 
     

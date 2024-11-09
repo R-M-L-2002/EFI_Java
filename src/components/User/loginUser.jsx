@@ -68,7 +68,7 @@ const LoginUser = () => {
                         value={values.password}
                     />
                     {errors.password && touched.password && errors.password}
-                    <button onClick={() => onLoginUser(values)} type="button" disabled={values.password === '' || values.username === '' || !isValid}>
+                    <button onClick={() => onLoginUser(values)} className="submit-button" type="button" disabled={values.password === '' || values.username === '' || !isValid}>
                         Iniciar Sesión
                     </button>
                 </form>

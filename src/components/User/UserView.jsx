@@ -7,8 +7,10 @@ import { Dialog } from "primereact/dialog";
 import { ToggleButton } from "primereact/togglebutton";
 import { Formik } from "formik";
 import * as Yup from "yup";
+import { useNavigate } from 'react-router-dom';  // Importar useNavigate
 
 const UsersView = ({ loadingUsers, dataUsers, fetchUsers }) => {
+    const navigate = useNavigate(); // Usar el hook useNavigate
     const token = JSON.parse(localStorage.getItem("token"));
     const [openDialogEditUser, setOpenDialogEditUser] = useState(false);
     const [editUser, setEditUser] = useState({});
@@ -102,9 +104,15 @@ const UsersView = ({ loadingUsers, dataUsers, fetchUsers }) => {
         })
         .catch((error) => console.error("Error deleting user:", error));
     };
-    
+
     return (
         <Fragment>
+            <h1>Usuarios</h1>
+            <Button
+                label="Agregar nuevo usuario"
+                icon="pi pi-plus"
+                onClick={() => navigate("/nuevo-usuario")}  // Usar navigate aquí
+            />
             {loadingUsers ? (
                 <ProgressSpinner />
             ) : (

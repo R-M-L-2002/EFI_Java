@@ -82,7 +82,7 @@ const CreateUser = () => {
                 value={values.password}
             />
             {errors.password && touched.password && errors.password}
-            <button type="submit" disabled={!isValid}>
+            <button type="submit" className="submit-button" disabled={!isValid}>
                 Crear usuario
             </button>
         </form>
